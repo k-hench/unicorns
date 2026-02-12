@@ -29,6 +29,8 @@ flickers = [ease.mapping_1, ease.mapping_2, ease.mapping_3, ease.mapping_4, ease
 n_flickers = len(flickers)
 current_flickers = [ flickers[int(random.uniform(0, n_flickers - 1))] for _ in range(n_flickers) ]
 
+dim_factors = [ random.uniform(0.6, 1) for _ in range(n_flickers)  ]
+
 def scl(x):
   return(int(35536 * x))
 
@@ -44,17 +46,19 @@ while True:
   for current_led in range(n_leds):
     if ts[current_led]  > 1:
        # sample new flicker pattern
-       current_flickers[current_led] = flickers[int(random.uniform(0, n_flickers - 1))]
+       flckr_idx = int(random.uniform(0, n_flickers - 1))
+       current_flickers[current_led] = flickers[flckr_idx]
+       dim_factors[current_led] = random.uniform(0.6, 1)
        # set new pulse speed
        pulse_speeds[current_led] = random.uniform(4000, 10000)
        # reset timers
        t_last_stops[current_led] = time.ticks_ms()
        loops[current_led] += 1
-       print("led_" + str(current_led) + "\tflicker: " + str(current_led)+ "\tloop " + str(loops[current_led]) + "\tduration: " + str(round(pulse_speeds[current_led]  / 1000, 3)))
+       print("led_" + str(current_led) + "\tflicker: " + str(flckr_idx)+ "\tloop " + str(loops[current_led]) + "\tduration: " + str(round(pulse_speeds[current_led]  / 1000, 3)))
        ts[current_led] = 0
 
  
     # set led brightness 
-    set_led_brightness(current_led, current_flickers[current_led](ts[current_led]))
+    set_led_brightness(current_led, dim_factors[current_led] * current_flickers[current_led](ts[current_led]))
       
   time.sleep(1/24)
